@@ -119,6 +119,9 @@ found:
   p->rtime = 0;
   p->iotime = 0;
 
+  // Set the default value for process's priority to 60
+  p->priority = 60;
+
   return p;
 }
 
