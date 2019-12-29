@@ -49,10 +49,10 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  int stime;                   // Start time
-  int etime;                   // End time
-  int iotime;                  // I/O time
-  int rtime;                   // Total time
+  int stime;                   // Start time / initialized in allocproc / doesn't get updated
+  int etime;                   // End time / gets updated in exit function / initialized in allocproc
+  int iotime;                  // I/O time / gets updated in trap function / initialized in allocproc
+  int rtime;                   // Total time / getes updated in trap function / initialized in allocproc
 
 };
 
