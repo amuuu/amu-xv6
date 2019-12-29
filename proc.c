@@ -417,7 +417,7 @@ scheduler(void)
     acquire(&ptable.lock);
 
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->priority < minproc) {
+      if(p->priority <= minproc) {
         minproc = p->priority;
       }
     }
