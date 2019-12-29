@@ -52,6 +52,7 @@ struct proc {
   int stime;                   // Start time
   int etime;                   // End time
   int iotime;                  // I/O time
+  int rtime;                   // Total time
 
 };
 
