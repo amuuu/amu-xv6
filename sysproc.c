@@ -40,6 +40,18 @@ sys_waitx(void)
 }
 
 int
+sys_setpriority(void)
+{
+  int new_priority;
+  
+  if(argint(0, &new_priority) < 0)
+    return -1;
+  
+  return setpriority(new_priority);
+}
+
+
+int
 sys_kill(void)
 {
   int pid;
@@ -54,6 +66,7 @@ sys_getpid(void)
 {
   return myproc()->pid;
 }
+
 
 int
 sys_sbrk(void)
