@@ -416,7 +416,7 @@ scheduler(void)
     acquire(&ptable.lock);
 
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->priority <= c->minpriority) {
+      if(p->priority < c->minpriority) {
         c->minpriority = p->priority;
       }
     }
@@ -425,7 +425,7 @@ scheduler(void)
       if(p->state != RUNNABLE)
         continue;
 
-      // Max priorities first!!!
+      // Min priorities first!!!
       // Two processes with equal priority numbers are chosen automatically based on round robin method.
       if(p->priority != c->minpriority)
         continue;
