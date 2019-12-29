@@ -374,7 +374,15 @@ waitx (int *wtime , int *rtime) {
 
 int
 setpriority (int newprio) {
-  return 1;
+  acquire(&ptable.lock); 
+  if (newprio < myproc()->priority) {
+    myproc()->priority = newprio;
+    sched();
+  }
+  else {
+    myproc()->priority = newprio;
+  }
+  release(&ptable.lock);
 }
 
 
