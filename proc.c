@@ -378,11 +378,16 @@ setpriority (int newprio) {
   if (newprio < myproc()->priority) {
     myproc()->priority = newprio;
     sched();
+    release(&ptable.lock);
+    return 2;
   }
   else {
     myproc()->priority = newprio;
+    release(&ptable.lock);
+    return 1;
   }
   release(&ptable.lock);
+  return -1;
 }
 
 
