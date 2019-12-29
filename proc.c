@@ -311,6 +311,12 @@ wait(void)
   }
 }
 
+
+int
+waitx (int *wtime , int *rtime) {
+    return 1;
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
