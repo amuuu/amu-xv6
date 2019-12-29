@@ -416,8 +416,8 @@ scheduler(void)
     acquire(&ptable.lock);
 
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->priority <= mycpu()->minpriority) {
-        mycpu()->minpriority = p->priority;
+      if(p->priority <= c->minpriority) {
+        c->minpriority = p->priority;
       }
     }
 
@@ -427,7 +427,7 @@ scheduler(void)
 
       // Max priorities first!!!
       // Two processes with equal priority numbers are chosen automatically based on round robin method.
-      if(p->priority != mycpu()->minpriority)
+      if(p->priority != c->minpriority)
         continue;
 
       // Switch to chosen process.  It is the process's job
