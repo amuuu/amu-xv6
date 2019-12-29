@@ -407,7 +407,6 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  int minproc = 1000;
   
   for(;;){
     // Enable interrupts on this processor.
@@ -417,8 +416,8 @@ scheduler(void)
     acquire(&ptable.lock);
 
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->priority <= minproc) {
-        minproc = p->priority;
+      if(p->priority <= mycpu()->minpriority) {
+        mycpu()->minpriority = p->priority;
       }
     }
 
@@ -428,7 +427,7 @@ scheduler(void)
 
       // Max priorities first!!!
       // Two processes with equal priority numbers are chosen automatically based on round robin method.
-      if(p->priority != minproc)
+      if(p->priority != mycpu()->minpriority)
         continue;
 
       // Switch to chosen process.  It is the process's job
