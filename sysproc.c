@@ -32,7 +32,8 @@ sys_waitx(void)
   int* wtime;
   int* rtime;
 
-  if ((argptr(1, (void*) &wtime,sizeof(int*)) < 0) || (argptr(1, (void*) &rtime,sizeof(int*)) < 0)) // not sure about this one
+  if ((argptr(1, (void*) &wtime, sizeof(int)) < 0) ||
+      (argptr(1, (void*) &rtime, sizeof(int)) < 0))
     return -1;
 
   return waitx(wtime, rtime);
