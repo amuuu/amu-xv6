@@ -53,7 +53,7 @@ struct proc {
   int etime;                   // End time / gets updated in exit function / initialized in allocproc
   int iotime;                  // I/O time / gets updated in trap function / initialized in allocproc
   int rtime;                   // Total time / getes updated in trap function / initialized in allocproc
-
+  int priority;                // Priority of the process (between 0 and 100)
 };
 
 // Process memory is laid out contiguously, low addresses first:
