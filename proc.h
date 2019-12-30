@@ -100,10 +100,10 @@ void qupop(Qunode** head)
 } 
 
 // Push to queue according to priority 
-void qupush(Qunode** head, int pid, int p) 
+void qupush(Qunode** head, struct proc* proc, int p) 
 { 
     Qunode* start = (*head);
-    Qunode* temp = newqunode(pid, p); 
+    Qunode* temp = newqunode(proc, p); 
   
     if ((*head)->priority > p) {   
         temp->next = *head; 
