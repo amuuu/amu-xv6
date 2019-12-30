@@ -82,21 +82,21 @@ allocproc(void)
     if(p->state == UNUSED)
       goto found;
 
-  p->priority = 101; // not sure about this one
+  p->priority = 101; // 101 for not normal process
   release(&ptable.lock);
   return 0;
 
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  p->priority = 60;
+  p->priority = 60; // 60 for normal usable process
 
   release(&ptable.lock);
 
   // Allocate kernel stack.
   if((p->kstack = kalloc()) == 0){
     p->state = UNUSED;  
-    p->priority = 101; // not sure about this one
+    p->priority = 101; // 101 for unused process
     return 0;
   }
   sp = p->kstack + KSTACKSIZE;
@@ -412,97 +412,94 @@ setpriority (int newprio) {
 void
 scheduler(void)
 {
-  struct proc *p;
-  struct cpu *c = mycpu();
-  c->proc = 0;
 
-  for(;;){
-    // Enable interrupts on this processor.
-    sti();
+  // Type 1: Q2
+  // Type 2: round robin
+  // Type 3: 
+  int type = 1; 
+  if (type == 1) {
+    struct proc *p;
+    struct cpu *c = mycpu();
+    c->proc = 0;
 
-    // Loop over process table looking for process to run.
-    acquire(&ptable.lock);
-    // cprintf("Printing....\n");
-    // Find minpriority in whole cpu processes
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->priority == 0 && p->pid == 0)
-        continue;
-      if (p->priority < c->minpriority) {
-        c->minpriority = p->priority;
-        // cprintf("p %d prio %d\n", p->pid, p->priority);
+    for(;;){
+      // Enable interrupts on this processor.
+      sti();
+
+      // Loop over process table looking for process to run.
+      acquire(&ptable.lock);
+
+      // Find minpriority in whole cpu processes
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->priority == 0 && p->pid == 0)
+          continue;
+        if (p->priority < c->minpriority)
+          c->minpriority = p->priority;
+      }
+
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+          continue;
+
+        // Min priorities first!!!
+        // Two processes with equal priority numbers are chosen automatically based on round robin method.
+        if(p->priority > c->minpriority)
+          continue;
+        
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
+
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
 
       }
-    }
-    // cprintf("End....\n");
-
-
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
-
-      // cprintf("p %d\n", p->priority);
-      // cprintf("c %d\n", c->minpriority);
-
-      // Min priorities first!!!
-      // Two processes with equal priority numbers are chosen automatically based on round robin method.
-      if((p->pid != 0) && (p->priority > c->minpriority))
-        continue;
-      
-      // cprintf("p %d\n", p->priority);
-      // cprintf("c %d\n", c->minpriority);
-
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
-
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
+      release(&ptable.lock);
 
     }
-    release(&ptable.lock);
-
   }
+// /*
+  else {  
+    struct proc *p;
+    struct cpu *c = mycpu();
+    c->proc = 0;
+    
+    for(;;){
+      // Enable interrupts on this processor.
+      sti();
 
-  /*
-  struct proc *p;
-  struct cpu *c = mycpu();
-  c->proc = 0;
+      // Loop over process table looking for process to run.
+      acquire(&ptable.lock);
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+          continue;
+
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
+
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+      }
+      release(&ptable.lock);
+
+    }
+  }
   
-  for(;;){
-    // Enable interrupts on this processor.
-    sti();
-
-    // Loop over process table looking for process to run.
-    acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
-
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
-
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
-    }
-    release(&ptable.lock);
-
-  }
-  */
 }
 
 // Enter scheduler.  Must hold only ptable.lock
