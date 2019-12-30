@@ -77,7 +77,7 @@ typedef struct qunode {
 } Qunode;
 
 // Add new node to priority queue
-Qunode* newNode(int p) { 
+Qunode* qunewNode(int p) { 
     Qunode* temp = (Qunode*)malloc(sizeof(Qunode)); 
     temp->priority = p; 
     temp->next = 0; 
@@ -91,7 +91,7 @@ int quheadvalue(Qunode** head)
 } 
   
 // Removes the element with the highest priority form the queue
-void pop(Qunode** head) 
+void qupop(Qunode** head) 
 { 
     Qunode* temp = *head; 
     (*head) = (*head)->next; 
@@ -99,7 +99,7 @@ void pop(Qunode** head)
 } 
 
 // Push to queue according to priority 
-void push(Qunode** head, int p) 
+void qupush(Qunode** head, int p) 
 { 
     Qunode* start = (*head);
     Qunode* temp = newNode(p); 
@@ -117,3 +117,9 @@ void push(Qunode** head, int p)
         start->next = temp; 
     } 
 }
+
+// Function to check is queue is empty 
+int quisempty(Qunode** head) 
+{ 
+    return (*head) == 0; 
+} 
