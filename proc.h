@@ -1,3 +1,10 @@
+// This is used in multi-level priority queue scheduling algorithm 
+typedef struct qunode {
+  int pid;
+  int priority;
+  struct qunode *next;
+} Qunode;
+
 // Per-CPU state
 struct cpu {
   uchar apicid;                // Local APIC ID
@@ -10,9 +17,9 @@ struct cpu {
   struct proc *proc;           // The process running on this cpu or null
   int minpriority;             // The minimum priority amongst all processes in CPU
                                // (this is used in normal priority scheduler algorithm)
-  Qunode *highlevelpq;         // High level priority queue (this is used in multi-level priority scheduler algorithm))
-  Qunode *midlevelpq;          // Mid level priority queue (this is used in multi-level priority scheduler algorithm))
-  Qunode *lowlevelpq;          // Low level priority queue (this is used in multi-level priority scheduler algorithm))
+  Qunode *highlevelpq;         // High level priority queue (this is used in multi-level priority queue scheduler algorithm)
+  Qunode *midlevelpq;          // Mid level priority queue (this is used in multi-level priority queue scheduler algorithm)
+  Qunode *lowlevelpq;          // Low level priority queue (this is used in multi-level priority queue scheduler algorithm)
 };
 
 extern struct cpu cpus[NCPU];
@@ -68,17 +75,9 @@ struct proc {
 //   expandable heap
 
 
-
-// This is used in multi-level priority queue scheduling algorithm 
-typedef struct qunode {
-  int pid;
-  int priority;
-  struct qunode *next;
-} Qunode;
-
 // Add new node to priority queue
-Qunode* qunewNode(int pid, int p) { 
-    Qunode* temp = (Qunode*)malloc(sizeof(Qunode)); 
+Qunode* newqunode(int pid, int p) { 
+    Qunode* temp = (Qunode*) malloc(sizeof(Qunode)); 
     temp->pid = pid;
     temp->priority = p; 
     temp->next = 0; 
@@ -94,7 +93,7 @@ int quheadpid(Qunode** head)
 // Removes the element with the highest priority form the queue
 void qupop(Qunode** head) 
 { 
-    Qunode* temp = *head; 
+    // Qunode* temp = *head; 
     (*head) = (*head)->next; 
     // free(temp); 
 } 
@@ -103,7 +102,7 @@ void qupop(Qunode** head)
 void qupush(Qunode** head, int pid, int p) 
 { 
     Qunode* start = (*head);
-    Qunode* temp = newNode(pid, p); 
+    Qunode* temp = newqunode(pid, p); 
   
     if ((*head)->priority > p) {   
         temp->next = *head; 
