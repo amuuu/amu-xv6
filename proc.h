@@ -71,23 +71,24 @@ struct proc {
 
 // This is used in multi-level priority queue scheduling algorithm 
 typedef struct qunode {
-  int data; // not used
+  int pid;
   int priority;
   struct qunode *next;
 } Qunode;
 
 // Add new node to priority queue
-Qunode* qunewNode(int p) { 
+Qunode* qunewNode(int pid, int p) { 
     Qunode* temp = (Qunode*)malloc(sizeof(Qunode)); 
+    temp->pid = pid;
     temp->priority = p; 
     temp->next = 0; 
     return temp; 
 }
 
 // Return the value at head of the queue
-int quheadvalue(Qunode** head) 
+int quheadpid(Qunode** head) 
 { 
-    return (*head)->data; 
+    return (*head)->pid; 
 } 
   
 // Removes the element with the highest priority form the queue
@@ -99,10 +100,10 @@ void qupop(Qunode** head)
 } 
 
 // Push to queue according to priority 
-void qupush(Qunode** head, int p) 
+void qupush(Qunode** head, int pid, int p) 
 { 
     Qunode* start = (*head);
-    Qunode* temp = newNode(p); 
+    Qunode* temp = newNode(pid, p); 
   
     if ((*head)->priority > p) {   
         temp->next = *head; 
