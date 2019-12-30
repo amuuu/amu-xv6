@@ -1,6 +1,6 @@
 // This is used in multi-level priority queue scheduling algorithm 
 typedef struct qunode {
-  int pid;
+  struct proc *proc;
   int priority;
   struct qunode *next;
 } Qunode;
@@ -76,18 +76,19 @@ struct proc {
 
 
 // Add new node to priority queue
-Qunode* newqunode(int pid, int p) { 
-    Qunode* temp = (Qunode*) malloc(sizeof(Qunode)); 
-    temp->pid = pid;
+Qunode* newqunode(struct proc* proc, int p) { 
+    Qunode* temp = 0;
+    memset(temp, 0, sizeof(Qunode));
+    temp->proc = proc;
     temp->priority = p; 
     temp->next = 0; 
     return temp; 
 }
 
-// Return the value at head of the queue
+// Return the pid of the head of the queue
 int quheadpid(Qunode** head) 
 { 
-    return (*head)->pid; 
+    return (*head)->proc->pid; 
 } 
   
 // Removes the element with the highest priority form the queue
