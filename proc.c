@@ -680,3 +680,56 @@ procdump(void)
     cprintf("\n");
   }
 }
+
+
+///// PRIORITY QUEUE FUNCTIONS /////
+
+// Add new node to priority queue
+Qunode* newqunode(struct proc* proc, int p) { 
+    Qunode* temp = 0;
+    memset(temp, 0, sizeof(Qunode));
+    temp->proc = proc;
+    temp->priority = p; 
+    temp->next = 0; 
+    return temp; 
+}
+
+// Return the pid of the head of the queue
+int quheadpid(Qunode** head) 
+{ 
+    return (*head)->proc->pid; 
+} 
+  
+// Removes the element with the highest priority form the queue
+void qupop(Qunode** head) 
+{ 
+    // Qunode* temp = *head; 
+    (*head) = (*head)->next; 
+    // free(temp); 
+} 
+
+// Push to queue according to priority 
+void qupush(Qunode** head, struct proc* proc, int p) 
+{ 
+    Qunode* start = (*head);
+    Qunode* temp = newqunode(proc, p); 
+  
+    if ((*head)->priority > p) {   
+        temp->next = *head; 
+        (*head) = temp; 
+    } 
+    else { 
+        while (start->next != 0 && 
+               start->next->priority < p) { 
+            start = start->next; 
+        }   
+        temp->next = start->next; 
+        start->next = temp; 
+    } 
+}
+
+// Function to check is queue is empty 
+int quisempty(Qunode** head) 
+{ 
+    return (*head) == 0; 
+} 
