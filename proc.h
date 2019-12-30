@@ -10,6 +10,9 @@ struct cpu {
   struct proc *proc;           // The process running on this cpu or null
   int minpriority;             // The minimum priority amongst all processes in CPU
                                // (this is used in normal priority scheduler algorithm)
+  Qunode *highlevelpq;         // High level priority queue (this is used in multi-level priority scheduler algorithm))
+  Qunode *midlevelpq;          // Mid level priority queue (this is used in multi-level priority scheduler algorithm))
+  Qunode *lowlevelpq;          // Low level priority queue (this is used in multi-level priority scheduler algorithm))
 };
 
 extern struct cpu cpus[NCPU];
@@ -68,6 +71,29 @@ struct proc {
 
 // This is used in multi-level priority queue scheduling algorithm 
 typedef struct qunode {
+  int data; // not used
   int priority;
   struct qunode *next;
 } Qunode;
+
+// Add new node to priority queue
+Qunode* newNode(int p) { 
+    Qunode* temp = (Qunode*)malloc(sizeof(Qunode)); 
+    temp->priority = p; 
+    temp->next = 0; 
+    return temp; 
+}
+
+// Return the value at head of the queue
+int quheadvalue(Qunode** head) 
+{ 
+    return (*head)->data; 
+} 
+  
+// Removes the element with the highest priority form the queue
+void pop(Qunode** head) 
+{ 
+    Qunode* temp = *head; 
+    (*head) = (*head)->next; 
+    // free(temp); 
+} 
