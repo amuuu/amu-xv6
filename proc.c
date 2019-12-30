@@ -82,18 +82,21 @@ allocproc(void)
     if(p->state == UNUSED)
       goto found;
 
+  p->priority = 101; // not sure about this one
   release(&ptable.lock);
   return 0;
 
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p->priority = 60;
 
   release(&ptable.lock);
 
   // Allocate kernel stack.
   if((p->kstack = kalloc()) == 0){
-    p->state = UNUSED;
+    p->state = UNUSED;  
+    p->priority = 101; // not sure about this one
     return 0;
   }
   sp = p->kstack + KSTACKSIZE;
@@ -152,15 +155,16 @@ userinit(void)
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 
+  p->priority = 60;
+
   // this assignment to p->state lets other cores
   // run this process. the acquire forces the above
   // writes to be visible, and the lock is also needed
   // because the assignment might not be atomic.
   acquire(&ptable.lock);
-
-  p->state = RUNNABLE;
-
+  p->state = RUNNABLE;  
   release(&ptable.lock);
+
 }
 
 // Grow current process's memory by n bytes.
@@ -221,11 +225,11 @@ fork(void)
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
   pid = np->pid;
+  np->priority = 60;
 
   acquire(&ptable.lock);
 
   np->state = RUNNABLE;
-
   release(&ptable.lock);
 
   return pid;
@@ -273,7 +277,9 @@ exit(void)
 
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
-
+  
+  curproc->priority = 101;
+  
   // Update the end time of process
   curproc->etime = ticks;
 
@@ -309,6 +315,7 @@ wait(void)
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
+        p->priority = 101;
         release(&ptable.lock);
         return pid;
       }
@@ -356,6 +363,7 @@ waitx (int *wtime , int *rtime) {
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
+        p->priority = 101;
         release(&ptable.lock);
         return pid;
       }
@@ -407,28 +415,41 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  
+
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-
+    // cprintf("Printing....\n");
+    // Find minpriority in whole cpu processes
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->priority < c->minpriority) {
+      if(p->priority == 0 && p->pid == 0)
+        continue;
+      if (p->priority < c->minpriority) {
         c->minpriority = p->priority;
+        // cprintf("p %d prio %d\n", p->pid, p->priority);
+
       }
     }
+    // cprintf("End....\n");
+
 
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
 
+      // cprintf("p %d\n", p->priority);
+      // cprintf("c %d\n", c->minpriority);
+
       // Min priorities first!!!
       // Two processes with equal priority numbers are chosen automatically based on round robin method.
-      if(p->priority != c->minpriority)
+      if((p->pid != 0) && (p->priority > c->minpriority))
         continue;
+      
+      // cprintf("p %d\n", p->priority);
+      // cprintf("c %d\n", c->minpriority);
 
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
@@ -443,6 +464,7 @@ scheduler(void)
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
+
     }
     release(&ptable.lock);
 
@@ -588,8 +610,9 @@ wakeup1(void *chan)
   struct proc *p;
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if(p->state == SLEEPING && p->chan == chan)
+    if(p->state == SLEEPING && p->chan == chan) {
       p->state = RUNNABLE;
+    }
 }
 
 // Wake up all processes sleeping on chan.
