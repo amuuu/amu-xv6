@@ -97,3 +97,23 @@ void pop(Qunode** head)
     (*head) = (*head)->next; 
     // free(temp); 
 } 
+
+// Push to queue according to priority 
+void push(Qunode** head, int p) 
+{ 
+    Qunode* start = (*head);
+    Qunode* temp = newNode(p); 
+  
+    if ((*head)->priority > p) {   
+        temp->next = *head; 
+        (*head) = temp; 
+    } 
+    else { 
+        while (start->next != 0 && 
+               start->next->priority < p) { 
+            start = start->next; 
+        }   
+        temp->next = start->next; 
+        start->next = temp; 
+    } 
+}
