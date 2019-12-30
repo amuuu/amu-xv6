@@ -9,6 +9,7 @@ struct cpu {
   int intena;                  // Were interrupts enabled before pushcli?
   struct proc *proc;           // The process running on this cpu or null
   int minpriority;             // The minimum priority amongst all processes in CPU
+                               // (this is used in normal priority scheduler algorithm)
 };
 
 extern struct cpu cpus[NCPU];
@@ -62,3 +63,11 @@ struct proc {
 //   original data and bss
 //   fixed-size stack
 //   expandable heap
+
+
+
+// This is used in multi-level priority queue scheduling algorithm 
+typedef struct qunode {
+  int priority;
+  struct qunode *next;
+} Qunode;
