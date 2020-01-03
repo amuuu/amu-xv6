@@ -92,11 +92,13 @@ allocproc(void)
   p->priority = 101; // 101 for not normal process
   
   // For multi-level queue scheduling
-  // if(quisempty(&mycpu()->highlevelpq)) {
-  //   mycpu()->highlevelpq = newqunode(p, 101); // this node will be the head if the queue is empty
-  // } else {
-  //   qupush(&mycpu()->highlevelpq, p, 101); // this node will not be the head if the queue has at least one object
-  // }
+  if(p->pid>2) {
+    if(quisempty(&mycpu()->highlevelpq)) {
+      mycpu()->highlevelpq = newqunode(p, 101); // this node will be the head if the queue is empty
+    } else {
+      qupush(&mycpu()->highlevelpq, p, 101); // this node will not be the head if the queue has at least one object
+    }
+  }
 
   release(&ptable.lock);
   return 0;
@@ -109,11 +111,13 @@ found:
   p->priority = 60; // 60 for normal usable process
 
   // For multi-level queue scheduling
-  // if(quisempty(&mycpu()->highlevelpq)) {
-  //   mycpu()->highlevelpq = newqunode(p, 60); // this node will be the head if the queue is empty
-  // } else {
-  //   qupush(&mycpu()->highlevelpq, p, 60); // this node will not be the head if the queue has at least one object
-  // }
+  if(p->pid>2) {
+    if(quisempty(&mycpu()->highlevelpq)) {
+      mycpu()->highlevelpq = newqunode(p, 60); // this node will be the head if the queue is empty
+    } else {
+      qupush(&mycpu()->highlevelpq, p, 60); // this node will not be the head if the queue has at least one object
+    }
+  }
 
   release(&ptable.lock);
 
@@ -125,11 +129,13 @@ found:
     p->priority = 101; // 101 for unused process
     
     // For multi-level queue scheduling
-    // if(quisempty(&mycpu()->highlevelpq)) {
-    //   mycpu()->highlevelpq = newqunode(p, 101); // this node will be the head if the queue is empty
-    // } else {
-    //   qupush(&mycpu()->highlevelpq, p, 101); // this node will not be the head if the queue has at least one object
-    // }
+    if(p->pid>2) {
+      if(quisempty(&mycpu()->highlevelpq)) {
+        mycpu()->highlevelpq = newqunode(p, 101); // this node will be the head if the queue is empty
+      } else {
+        qupush(&mycpu()->highlevelpq, p, 101); // this node will not be the head if the queue has at least one object
+      }
+    }
     
     return 0;
   }
@@ -161,11 +167,13 @@ found:
   p->priority = 60;
 
   // For multi-level queue scheduling
-  // if(quisempty(&mycpu()->highlevelpq)) {
-  //   mycpu()->highlevelpq = newqunode(p, 60); // this node will be the head if the queue is empty
-  // } else {
-  //   qupush(&mycpu()->highlevelpq, p, 60); // this node will not be the head if the queue has at least one object
-  // }
+  if(p->pid>2) {
+    if(quisempty(&mycpu()->highlevelpq)) {
+      mycpu()->highlevelpq = newqunode(p, 60); // this node will be the head if the queue is empty
+    } else {
+      qupush(&mycpu()->highlevelpq, p, 60); // this node will not be the head if the queue has at least one object
+    }
+  }
 
   return p;
 }
@@ -201,11 +209,13 @@ userinit(void)
   p->priority = 60;
 
   // For multi-level queue scheduling
-  // if(quisempty(&mycpu()->highlevelpq)) {
-  //   mycpu()->highlevelpq = newqunode(p, 60); // this node will be the head if the queue is empty
-  // } else {
-  //   qupush(&mycpu()->highlevelpq, p, 60); // this node will not be the head if the queue has at least one object
-  // }
+  if(p->pid>2) {
+    if(quisempty(&mycpu()->highlevelpq)) {
+      mycpu()->highlevelpq = newqunode(p, 60); // this node will be the head if the queue is empty
+    } else {
+      qupush(&mycpu()->highlevelpq, p, 60); // this node will not be the head if the queue has at least one object
+    }
+  }
 
   // this assignment to p->state lets other cores
   // run this process. the acquire forces the above
@@ -280,11 +290,13 @@ fork(void)
   np->priority = 60;
 
   // For multi-level queue scheduling
-  // if(quisempty(&mycpu()->highlevelpq)) {
-  //   mycpu()->highlevelpq = newqunode(np, 60); // this node will be the head if the queue is empty
-  // } else {
-  //   qupush(&mycpu()->highlevelpq, np, 60); // this node will not be the head if the queue has at least one object
-  // }
+  if(np->pid>2) {
+    if(quisempty(&mycpu()->highlevelpq)) {
+      mycpu()->highlevelpq = newqunode(np, 60); // this node will be the head if the queue is empty
+    } else {
+      qupush(&mycpu()->highlevelpq, np, 60); // this node will not be the head if the queue has at least one object
+    }
+  }
 
   acquire(&ptable.lock);
 
@@ -342,9 +354,9 @@ exit(void)
 
   // For multi-level queue scheduling
   // if(quisempty(&mycpu()->highlevelpq)) {
-  //   mycpu()->highlevelpq = newqunode(curproc, 101); // this node will be the head if the queue is empty
+    // mycpu()->highlevelpq = newqunode(curproc, 101); // this node will be the head if the queue is empty
   // } else {
-  //   qupush(&mycpu()->highlevelpq, curproc, 101); // this node will not be the head if the queue has at least one object
+    // qupush(&mycpu()->highlevelpq, curproc, 101); // this node will not be the head if the queue has at least one object
   // }
   
   // Update the end time of process
