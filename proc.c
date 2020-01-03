@@ -609,6 +609,12 @@ scheduler(void)
     }
   }
   else if (type == 2) {
+
+    // I modified CPU struct for this scheduler. I made 3 queues (highlevel, midlevel, and lowelevel)
+    // Each time a process gets created, it gets pushed to the highlevel queue. If you call the nice system call, 
+    // it reduces the myproc()'s priority to a queue with lower level.
+    // When a process gets chosen in the scheduler, it gets popped from it's queue.
+    // The process with the highest priority queue will get chosen first.
     cprintf("Using multi-level priority queue scheduler...\n");
 
     struct proc *p;
