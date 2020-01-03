@@ -507,6 +507,7 @@ int nice() {
   if(start->next->proc->pid == myproc()->pid) {
     qupush(&mycpu()->midlevelpq, start->next->proc, start->next->priority); // Push the process from high to mid queue
     start->next = start->next->next; // a->b->c ===> a->c (int the high queue)
+    shced();
     return 0;
   }
   else {
@@ -520,6 +521,7 @@ int nice() {
     if(start->next->proc->pid == myproc()->pid) {
       qupush(&mycpu()->lowlevelpq, start->next->proc, start->next->priority); // Push the process from mid to low queue
       start->next = start->next->next; // a->b->c ===> a->c (in the mid queue)
+      shced();
       return 0;
     }
   }
