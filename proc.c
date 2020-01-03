@@ -554,36 +554,46 @@ scheduler(void)
       // Loop over process table looking for process to run.
       acquire(&ptable.lock);
 
-      // Find minpriority in whole cpu processes
-      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if(p->priority == 0 && p->pid == 0)
-          continue;
-        if (p->priority < c->minpriority)
-          c->minpriority = p->priority;
+      struct proc* temp;
+      int checkedpq = 0;
+      if (!quisempty(c->highlevelpq)) {
+        temp = quhead(c->highlevelpq);
+        checkedpq = 1;
+      }
+      else if (!quisempty(c->midlevelpq)) {
+        temp = quhead(c->midlevelpq);
+        checkedpq = 2;
+      }
+      else if (!quisempty(c->lowlevelpq)) {
+        temp = quhead(c->lowlevelpq);
+        checkedpq = 3;
       }
 
       for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if(p->state != RUNNABLE)
-          continue;
+        if(p->pid == temp->pid) {
+          if(p->state != RUNNABLE)
+            continue;
+          
+          // Switch to chosen process.  It is the process's job
+          // to release ptable.lock and then reacquire it
+          // before jumping back to us.
+          c->proc = p;
+          switchuvm(p);
+          p->state = RUNNING;
 
-        // Min priorities first!!!
-        // Two processes with equal priority numbers are chosen automatically based on round robin method.
-        if(p->priority > c->minpriority)
-          continue;
-        
-        // Switch to chosen process.  It is the process's job
-        // to release ptable.lock and then reacquire it
-        // before jumping back to us.
-        c->proc = p;
-        switchuvm(p);
-        p->state = RUNNING;
+          swtch(&(c->scheduler), p->context);
+          switchkvm();
 
-        swtch(&(c->scheduler), p->context);
-        switchkvm();
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
 
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
+          // pop the process
+          if (checkedpq == 1) qupop(c->highlevelpq);
+          else if (checkedpq == 2) qupop(c->midlevelpq);
+          else if (checkedpq == 3) qupop(c->lowlevelpq);
+          else { continue; }
+        }
 
       }
       release(&ptable.lock);
@@ -819,9 +829,9 @@ Qunode* newqunode(struct proc* proc, int p) {
 }
 
 // Return the pid of the head of the queue
-int quheadpid(Qunode** head) 
+struct proc* quhead(Qunode** head) 
 { 
-    return (*head)->proc->pid; 
+    return (*head)->proc; 
 } 
   
 // Removes the element with the highest priority form the queue
