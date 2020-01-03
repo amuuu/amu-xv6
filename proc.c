@@ -528,6 +528,8 @@ scheduler(void)
 
 
   if (type == 1) {
+    cprintf("Using normal priority scheduler...\n");
+
     struct proc *p;
     struct cpu *c = mycpu();
     c->proc = 0;
@@ -576,7 +578,8 @@ scheduler(void)
     }
   }
   else if (type == 2) {
-    cprintf("here\n");
+    cprintf("Using multi-level priority queue scheduler...\n");
+
     struct proc *p;
     struct cpu *c = mycpu();
     c->proc = 0;
@@ -638,6 +641,7 @@ scheduler(void)
     }
   }
   else {  
+    cprintf("Using round robin scheduler...\n");
 
     struct proc *p;
     struct cpu *c = mycpu();
