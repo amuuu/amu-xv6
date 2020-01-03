@@ -659,7 +659,7 @@ scheduler(void)
           // It should have changed its p->state before coming back.
           c->proc = 0;
 
-          // pop the process
+          // pop the chosen process from the queue
           if (checkedpq == 1) qupop(&c->highlevelpq);
           else if (checkedpq == 2) qupop(&c->midlevelpq);
           else if (checkedpq == 3) qupop(&c->lowlevelpq);
