@@ -507,7 +507,7 @@ int nice() {
   if(start->next->proc->pid == myproc()->pid) {
     qupush(&mycpu()->midlevelpq, start->next->proc, start->next->priority);
     start->next = start->next->next; // a->b->c ===> a->c
-    return 1;
+    return 0;
   }
   else {
     Qunode* start_ = mycpu()->midlevelpq;
@@ -519,10 +519,10 @@ int nice() {
     if(start->next->proc->pid == myproc()->pid) {
       qupush(&mycpu()->lowlevelpq, start->next->proc, start->next->priority);
       start->next = start->next->next; // a->b->c ===> a->c
-      return 1;
+      return 0;
     }
   }
-  return 0;
+  return -1;
 }
 
 
