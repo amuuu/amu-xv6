@@ -506,7 +506,7 @@ int nice() {
   }
   if(start->next->proc->pid == myproc()->pid) {
     qupush(&mycpu()->midlevelpq, start->next->proc, start->next->priority); // Push the process from high to mid queue
-    start->next = start->next->next; // a->b->c ===> a->c (int the high queue)
+    start->next = start->next->next; // a->b->c ===> a->c (in the high queue)
     shced();
     return 0;
   }
@@ -556,8 +556,11 @@ scheduler(void)
   }
   release(&ptable.lock);
 
-  if(allow) type=2;
-  else type = 3;
+  if(allow) // If we are allowed to use multi-level queue
+    type=2;
+  
+  else // Else use the normal round robin method
+    type = 3;
 
 
   if (type == 1) {
