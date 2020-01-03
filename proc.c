@@ -540,7 +540,7 @@ int changequeueitemprio(int pid, int newprio) {
       start = start->next;
   }
   if(start->next->proc->pid == pid) {
-    start->next = start->next->next; // a->b->c ===> a->c (in the high queue)
+    start->next = start->next->next; // a->b->c ===> a->c
     qupush(&mycpu()->highlevelpq, start->next->proc, newprio);
     return 1;
   }
@@ -553,7 +553,7 @@ int changequeueitemprio(int pid, int newprio) {
       start_ = start_->next;
     }
     if(start_->next->proc->pid == pid) {
-      start_->next = start_->next->next; // a->b->c ===> a->c (in the high queue)
+      start_->next = start_->next->next; // a->b->c ===> a->c
       qupush(&mycpu()->midlevelpq, start_->next->proc, newprio);
       return 1;
     }
@@ -566,7 +566,7 @@ int changequeueitemprio(int pid, int newprio) {
         start__ = start->next;
       }
       if(start__->next->proc->pid == pid) {
-        start__->next = start__->next->next; // a->b->c ===> a->c (in the high queue)
+        start__->next = start__->next->next; // a->b->c ===> a->c
         qupush(&mycpu()->midlevelpq, start__->next->proc, newprio);
         return 1;
       }
