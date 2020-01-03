@@ -54,6 +54,9 @@ mpmain(void)
   cprintf("cpu%d: starting %d\n", cpuid(), cpuid());
   idtinit();       // load idt register
   mycpu()->minpriority = 1000; //////
+  mycpu()->highlevelminprio = 1000; //////
+  mycpu()->midlevelminprio = 1000; //////
+  mycpu()->lowlevelminpro = 1000; //////
   xchg(&(mycpu()->started), 1); // tell startothers() we're up
   scheduler();     // start running processes
 }
