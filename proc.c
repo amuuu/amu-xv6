@@ -269,7 +269,16 @@ fork(void)
   safestrcpy(np->name, curproc->name, sizeof(curproc->name));
 
   pid = np->pid;
+  
+  // For normal priority scheduling
   np->priority = 60;
+
+  // For multi-level queue scheduling
+  if(quisempty(mycpu()->highlevelpq)) {
+    mycpu()->highlevelpq = newqunode(np, 60); // this node will be the head if the queue is empty
+  } else {
+    qupush(&mycpu()->highlevelpq, np, 60); // this node will not be the head if the queue has at least one object
+  }
 
   acquire(&ptable.lock);
 
