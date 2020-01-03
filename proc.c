@@ -497,28 +497,29 @@ setpriority (int newprio) {
 
 int nice() {
 
-  // From high level to midlevel
+  // From high level to mid level
   Qunode* start = mycpu()->highlevelpq;
   while (start->next != 0 &&
-         start->next->proc->pid != myproc()->pid)
+         start->next->proc->pid != myproc()->pid) // Search for the process
   { 
       start = start->next;
   }
   if(start->next->proc->pid == myproc()->pid) {
-    qupush(&mycpu()->midlevelpq, start->next->proc, start->next->priority);
-    start->next = start->next->next; // a->b->c ===> a->c
+    qupush(&mycpu()->midlevelpq, start->next->proc, start->next->priority); // Push the process from high to mid queue
+    start->next = start->next->next; // a->b->c ===> a->c (int the high queue)
     return 0;
   }
   else {
+    // From mid level to low level
     Qunode* start_ = mycpu()->midlevelpq;
     while (start_->next != 0 &&
-         start_->next->proc->pid != myproc()->pid)
+         start_->next->proc->pid != myproc()->pid) // Search for the process
     { 
       start = start->next;
     }
     if(start->next->proc->pid == myproc()->pid) {
-      qupush(&mycpu()->lowlevelpq, start->next->proc, start->next->priority);
-      start->next = start->next->next; // a->b->c ===> a->c
+      qupush(&mycpu()->lowlevelpq, start->next->proc, start->next->priority); // Push the process from mid to low queue
+      start->next = start->next->next; // a->b->c ===> a->c (in the mid queue)
       return 0;
     }
   }
