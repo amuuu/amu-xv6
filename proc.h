@@ -17,7 +17,7 @@ struct cpu {
   struct proc *proc;           // The process running on this cpu or null
   int minpriority;             // The minimum priority amongst all processes in CPU
                                // (this is used in normal priority scheduler algorithm)
-  Qunode *highlevelpq;         // High level priority queue (this is used in multi-level priority queue scheduler algorithm)
+  Qunode *highlevelpq;         // High level priority queue (the default queue for when a process is allocated) (this is used in multi-level priority queue scheduler algorithm)
   Qunode *midlevelpq;          // Mid level priority queue (this is used in multi-level priority queue scheduler algorithm)
   Qunode *lowlevelpq;          // Low level priority queue (this is used in multi-level priority queue scheduler algorithm)
 };

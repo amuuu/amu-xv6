@@ -82,21 +82,49 @@ allocproc(void)
     if(p->state == UNUSED)
       goto found;
 
+  // For normal priority scheduling
   p->priority = 101; // 101 for not normal process
+  
+  // For multi-level queue scheduling
+  if(quisempty(mycpu()->highlevelpq)) {
+    mycpu()->highlevelpq = newqunode(p, 101); // this node will be the head if the queue is empty
+  } else {
+    qupush(&mycpu()->highlevelpq, p, 101); // this node will not be the head if the queue has at least one object
+  }
+
   release(&ptable.lock);
   return 0;
 
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+
+  // For normal priority scheduling
   p->priority = 60; // 60 for normal usable process
+
+  // For multi-level queue scheduling
+  if(quisempty(mycpu()->highlevelpq)) {
+    mycpu()->highlevelpq = newqunode(p, 60); // this node will be the head if the queue is empty
+  } else {
+    qupush(&mycpu()->highlevelpq, p, 60); // this node will not be the head if the queue has at least one object
+  }
 
   release(&ptable.lock);
 
   // Allocate kernel stack.
   if((p->kstack = kalloc()) == 0){
     p->state = UNUSED;  
+    
+    // For normal priority scheduling
     p->priority = 101; // 101 for unused process
+    // For multi-level queue scheduling
+    
+    if(quisempty(mycpu()->highlevelpq)) {
+      mycpu()->highlevelpq = newqunode(p, 101); // this node will be the head if the queue is empty
+    } else {
+      qupush(&mycpu()->highlevelpq, p, 101); // this node will not be the head if the queue has at least one object
+    }
+    
     return 0;
   }
   sp = p->kstack + KSTACKSIZE;
@@ -123,7 +151,15 @@ found:
   p->iotime = 0;
 
   // Set the default value for process's priority to 60
+  // For normal priority scheduling
   p->priority = 60;
+
+  // For multi-level queue scheduling
+  if(quisempty(mycpu()->highlevelpq)) {
+    mycpu()->highlevelpq = newqunode(p, 60); // this node will be the head if the queue is empty
+  } else {
+    qupush(&mycpu()->highlevelpq, p, 60); // this node will not be the head if the queue has at least one object
+  }
 
   return p;
 }
