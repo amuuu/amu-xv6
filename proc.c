@@ -511,11 +511,12 @@ scheduler(void)
   // Type 2: Multi-level queue (Q3)
   // Else: round robin 
   int type;
-  /*int allow = 0;
-  
+  int allow = 0;
+
+  // We don't need multi-level priority queue for first two processes in the system
   acquire(&ptable.lock);
   for(struct proc* p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p->pid!=0) {
+    if(p->pid > 2) {
       allow = 1;
       break;
     }
@@ -523,8 +524,7 @@ scheduler(void)
   release(&ptable.lock);
 
   if(allow) type=2;
-  else type = 3;*/
-  type = 5;
+  else type = 3;
 
 
   if (type == 1) {
@@ -576,6 +576,7 @@ scheduler(void)
     }
   }
   else if (type == 2) {
+    cprintf("here\n");
     struct proc *p;
     struct cpu *c = mycpu();
     c->proc = 0;
