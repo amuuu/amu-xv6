@@ -50,6 +50,11 @@ sys_setpriority(void)
   return setpriority(new_priority);
 }
 
+int
+sys_nice(void)
+{
+  return nice();
+}
 
 int
 sys_kill(void)

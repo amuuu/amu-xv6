@@ -495,6 +495,10 @@ setpriority (int newprio) {
   return -1;
 }
 
+int nice() {
+  return 1;
+}
+
 
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
