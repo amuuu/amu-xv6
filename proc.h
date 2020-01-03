@@ -20,6 +20,9 @@ struct cpu {
   Qunode *highlevelpq;         // High level priority queue (the default queue for when a process is allocated) (this is used in multi-level priority queue scheduler algorithm)
   Qunode *midlevelpq;          // Mid level priority queue (this is used in multi-level priority queue scheduler algorithm)
   Qunode *lowlevelpq;          // Low level priority queue (this is used in multi-level priority queue scheduler algorithm)
+  int highlevelminprio;        // The minimum priority amongst the processes inside highlevelpq
+  int midlevelminprio;         // The minimum priority amongst the processes inside midlevelpq
+  int lowlevelminpro;          // The minimum priority amongst the processes inside lowlevelpq
 };
 
 extern struct cpu cpus[NCPU];
