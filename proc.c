@@ -488,7 +488,7 @@ setpriority (int newprio) {
       return 2;
     }
     else {
-      changequeuepid(myproc()->pid, newprio);
+      changequeueitemprio(myproc()->pid, newprio);
       myproc()->priority = newprio;
       release(&ptable.lock);
       return 1;
@@ -510,7 +510,7 @@ int nice() {
   if(start->next->proc->pid == myproc()->pid) {
     qupush(&mycpu()->midlevelpq, start->next->proc, start->next->priority); // Push the process from high to mid queue
     start->next = start->next->next; // a->b->c ===> a->c (in the high queue)
-    shced();
+    sched();
     return 0;
   }
   else {
@@ -524,7 +524,7 @@ int nice() {
     if(start_->next->proc->pid == myproc()->pid) {
       qupush(&mycpu()->lowlevelpq, start_->next->proc, start_->next->priority); // Push the process from mid to low queue
       start_->next = start_->next->next; // a->b->c ===> a->c (in the mid queue)
-      shced();
+      sched();
       return 0;
     }
   }
@@ -570,8 +570,9 @@ int changequeueitemprio(int pid, int newprio) {
         qupush(&mycpu()->lowlevelpq, start__->next->proc, newprio);
         return 1;
       }
-  }
+    }
   return 0;
+  }
 }
 
 
