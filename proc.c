@@ -496,7 +496,33 @@ setpriority (int newprio) {
 }
 
 int nice() {
-  return 1;
+
+  // From high level to midlevel
+  Qunode* start = mycpu()->highlevelpq;
+  while (start->next != 0 &&
+         start->next->proc->pid != myproc()->pid)
+  { 
+      start = start->next;
+  }
+  if(start->next->proc->pid == myproc()->pid) {
+    qupush(&mycpu()->midlevelpq, start->next->proc, start->next->priority);
+    start->next = start->next->next; // a->b->c ===> a->c
+    return 1;
+  }
+  else {
+    Qunode* start_ = mycpu()->midlevelpq;
+    while (start_->next != 0 &&
+         start_->next->proc->pid != myproc()->pid)
+    { 
+      start = start->next;
+    }
+    if(start->next->proc->pid == myproc()->pid) {
+      qupush(&mycpu()->lowlevelpq, start->next->proc, start->next->priority);
+      start->next = start->next->next; // a->b->c ===> a->c
+      return 1;
+    }
+  }
+  return 0;
 }
 
 
@@ -862,8 +888,9 @@ procdump(void)
   }
 }
 
-
+////////////////////////////////////
 ///// PRIORITY QUEUE FUNCTIONS /////
+////////////////////////////////////
 
 // Add new node to priority queue
 Qunode* newqunode(struct proc* proc, int p) { 
