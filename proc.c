@@ -567,7 +567,7 @@ int changequeueitemprio(int pid, int newprio) {
       }
       if(start__->next->proc->pid == pid) {
         start__->next = start__->next->next; // a->b->c ===> a->c
-        qupush(&mycpu()->midlevelpq, start__->next->proc, newprio);
+        qupush(&mycpu()->lowlevelpq, start__->next->proc, newprio);
         return 1;
       }
   }
