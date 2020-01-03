@@ -331,7 +331,15 @@ exit(void)
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
   
+  // For normal priority scheduling
   curproc->priority = 101;
+
+  // For multi-level queue scheduling
+  if(quisempty(mycpu()->highlevelpq)) {
+    mycpu()->highlevelpq = newqunode(curproc, 101); // this node will be the head if the queue is empty
+  } else {
+    qupush(&mycpu()->highlevelpq, curproc, 101); // this node will not be the head if the queue has at least one object
+  }
   
   // Update the end time of process
   curproc->etime = ticks;
