@@ -479,19 +479,20 @@ waitx (int *wtime , int *rtime) {
 int
 setpriority (int newprio) {
   acquire(&ptable.lock); 
+  int oldprio = myproc()->priority;
   if (newprio >= 0 && newprio <= 100) {
-    if (newprio < myproc()->priority) {
+    if (newprio < oldprio) {
       changequeueitemprio(myproc()->pid, newprio);
       myproc()->priority = newprio;
       sched();
       release(&ptable.lock);
-      return 2;
+      return oldprio;
     }
     else {
       changequeueitemprio(myproc()->pid, newprio);
       myproc()->priority = newprio;
       release(&ptable.lock);
-      return 1;
+      return oldprio;
     }
   }
   release(&ptable.lock);
