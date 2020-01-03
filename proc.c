@@ -376,7 +376,15 @@ wait(void)
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
+        // For normal priority scheduling
         p->priority = 101;
+        // For multi-level queue scheduling
+        if(quisempty(mycpu()->highlevelpq)) {
+          mycpu()->highlevelpq = newqunode(curproc, 101); // this node will be the head if the queue is empty
+        } else {
+          qupush(&mycpu()->highlevelpq, curproc, 101); // this node will not be the head if the queue has at least one object
+        }
+
         release(&ptable.lock);
         return pid;
       }
@@ -424,7 +432,15 @@ waitx (int *wtime , int *rtime) {
         p->name[0] = 0;
         p->killed = 0;
         p->state = UNUSED;
+        // For normal priority scheduling
         p->priority = 101;
+        // For multi-level queue scheduling
+        if(quisempty(mycpu()->highlevelpq)) {
+          mycpu()->highlevelpq = newqunode(curproc, 101); // this node will be the head if the queue is empty
+        } else {
+          qupush(&mycpu()->highlevelpq, curproc, 101); // this node will not be the head if the queue has at least one object
+        }
+
         release(&ptable.lock);
         return pid;
       }
