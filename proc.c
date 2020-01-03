@@ -117,8 +117,8 @@ found:
     
     // For normal priority scheduling
     p->priority = 101; // 101 for unused process
-    // For multi-level queue scheduling
     
+    // For multi-level queue scheduling
     if(quisempty(mycpu()->highlevelpq)) {
       mycpu()->highlevelpq = newqunode(p, 101); // this node will be the head if the queue is empty
     } else {
