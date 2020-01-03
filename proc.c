@@ -25,6 +25,7 @@ struct proc* quhead(Qunode** head);
 void qupop(Qunode** head);
 void qupush(Qunode** head, struct proc* proc, int p);
 int quisempty(Qunode** head);
+int changequeueitemprio(int pid, int newprio);
 
 void
 pinit(void)
@@ -480,12 +481,14 @@ setpriority (int newprio) {
   acquire(&ptable.lock); 
   if (newprio >= 0 && newprio <= 100) {
     if (newprio < myproc()->priority) {
+      changequeueitemprio(myproc()->pid, newprio);
       myproc()->priority = newprio;
       sched();
       release(&ptable.lock);
       return 2;
     }
     else {
+      changequeuepid(myproc()->pid, newprio);
       myproc()->priority = newprio;
       release(&ptable.lock);
       return 1;
@@ -516,16 +519,57 @@ int nice() {
     while (start_->next != 0 &&
          start_->next->proc->pid != myproc()->pid) // Search for the process
     { 
-      start = start->next;
+      start_ = start_->next;
     }
-    if(start->next->proc->pid == myproc()->pid) {
-      qupush(&mycpu()->lowlevelpq, start->next->proc, start->next->priority); // Push the process from mid to low queue
-      start->next = start->next->next; // a->b->c ===> a->c (in the mid queue)
+    if(start_->next->proc->pid == myproc()->pid) {
+      qupush(&mycpu()->lowlevelpq, start_->next->proc, start_->next->priority); // Push the process from mid to low queue
+      start_->next = start_->next->next; // a->b->c ===> a->c (in the mid queue)
       shced();
       return 0;
     }
   }
   return -1;
+}
+
+int changequeueitemprio(int pid, int newprio) {
+  // Search in high level queue
+  Qunode* start = mycpu()->highlevelpq;
+  while (start->next != 0 &&
+         start->next->proc->pid != pid) // Search for the process
+  { 
+      start = start->next;
+  }
+  if(start->next->proc->pid == pid) {
+    start->next = start->next->next; // a->b->c ===> a->c (in the high queue)
+    qupush(&mycpu()->highlevelpq, start->next->proc, newprio);
+    return 1;
+  }
+  else {
+    // Search in mid level queue
+    Qunode* start_ = mycpu()->midlevelpq;
+    while (start_->next != 0 &&
+         start_->next->proc->pid != pid) // Search for the process
+    { 
+      start_ = start_->next;
+    }
+    if(start_->next->proc->pid == pid) {
+      start_->next = start_->next->next; // a->b->c ===> a->c (in the high queue)
+      qupush(&mycpu()->midlevelpq, start_->next->proc, newprio);
+      return 1;
+    }
+    else {
+      // Search in low level queue
+      Qunode* start__ = mycpu()->lowlevelpq;
+      while (start__->next != 0 &&
+          start__->next->proc->pid != pid) // Search for the process
+      { 
+        start__ = start->next;
+      }
+      if(start__->next->proc->pid == pid) {
+        start__->next = start__->next->next; // a->b->c ===> a->c (in the high queue)
+        qupush(&mycpu()->midlevelpq, start__->next->proc, newprio);
+      }
+  }
 }
 
 
