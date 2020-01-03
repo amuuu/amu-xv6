@@ -568,8 +568,10 @@ int changequeueitemprio(int pid, int newprio) {
       if(start__->next->proc->pid == pid) {
         start__->next = start__->next->next; // a->b->c ===> a->c (in the high queue)
         qupush(&mycpu()->midlevelpq, start__->next->proc, newprio);
+        return 1;
       }
   }
+  return 0;
 }
 
 
