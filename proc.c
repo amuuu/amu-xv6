@@ -191,7 +191,15 @@ userinit(void)
   safestrcpy(p->name, "initcode", sizeof(p->name));
   p->cwd = namei("/");
 
+  // For normal priority scheduling
   p->priority = 60;
+
+  // For multi-level queue scheduling
+  if(quisempty(mycpu()->highlevelpq)) {
+    mycpu()->highlevelpq = newqunode(p, 60); // this node will be the head if the queue is empty
+  } else {
+    qupush(&mycpu()->highlevelpq, p, 60); // this node will not be the head if the queue has at least one object
+  }
 
   // this assignment to p->state lets other cores
   // run this process. the acquire forces the above
