@@ -7,7 +7,7 @@ The following code adds some timers, 3 system calls, and also adds two schedulin
 
 ## Some tips for playing with xv6:
 - If you want to add a new normal* system call, you should edit these files: `proc.c`, `defs.h`, `syscall.c`, `sysproc.c`, `user.h`, `usys.S`, and `syscall.h`. 
-- In kernel mode, you can't use malloc to allocate memory. If you want to allocate memory for your struct, arrays, or anything, your only option is using `memset`.
+- In kernel mode, you can't use `malloc` to allocate memory. If you want to allocate memory for your struct, arrays, or anything, your only option is using `memset`. There is another function that can be used in kernel mode, `kalloc` which returns a value stating that whether memory is allocated for a process or not.
 - If you want to return multiple values from a system call, you **can't** return a pointer to an array because the program which is calling the system call, is in the user mode (the array is allocated in kernel mode) and doesn't have access to the place that array exists in memory. **Instead**, you can pass pointers in to the system call function and have the system call fill those pointers and return them to the program which is calling the system call. In this case, the pointers were initialized in the user mode and there won't be any problems.
 - This one might sound obvious, but if you want to add a new file, you should also change the Makefile in order for it to be compiled.
 
